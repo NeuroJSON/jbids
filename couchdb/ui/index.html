@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8"/>
+    <meta name="author" content="Qianqian Fang">
+    <meta name="copyright" content="Qianqian Fang" />
+    <meta name="license" content="GNU General Public License v3 or later" />
+    <meta name="keywords" content="NeuroJSON,BIDS,CouchDB,JSON,NIH"/>
+    <title>NeuroJSON data query test</title>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/1.0.11/pako.min.js"></script>
+    <script src="https://neurojson.org/js/jdata.js"></script>
+    <link rel='stylesheet' id='theme-link'>
+    <link rel='stylesheet' id='iconlib-link'>
+    <style id=page_style>
+      @page { size: 9in 7.5in ; margin : 0px }
+    </style>
+</head>
+
+<body>
+<section id="neurojsondb-title" class='current'>
+        <h1>NeuroJSON data query test</h1>
+	</p>
+</section>
+
+<section class='tab-content'>
+        <input id="dbname" style="width:33%" name="dbname" type="text" value='bids-samples' required minlength="3" placeholder="database name">
+        <button class='btn btn-primary' style="width:33%" id='btlistdb' onclick="listdb()">List BIDS Datasets</button><br/>
+        <input id="docname" style="width:33%" name="docname" type="text" value='' required minlength="3" placeholder="dataset name">
+        <button class='btn btn-primary' style="width:33%" id='btlistdoc' onclick="listdoc()">Retrieve A Dataset</button>
+        <textarea id='output' rows="25" style="width: 100%; font-family: monospace;"
+                      class='form-control'></textarea><br/>
+        <button class='btn btn-primary' style="width:33%" id='btfind' onclick="finddata()">Query Data</button>
+        <textarea id='finddoc' rows="8" style="width: 100%; font-family: monospace;"
+                      class='form-control'>{
+  "selector": {
+     "dataset_description\\.json.BIDSVersion": {"$gt": "1.2.0"}
+  },
+  "fields": ["_id", "_rev", "dataset_description\\.json.BIDSVersion"],
+  "execution_stats": true
+}
+</textarea>
+</section>
+
+<script>
+  "use strict";
+
+var serverurl="http://kylin.coe.neu.edu:5984";
+
+function listdb(){
+  let dbname=$("#dbname").val();
+  $.ajax({
+      url: serverurl+'/'+dbname+'/_all_docs',
+      type: 'GET',
+      dataType: "json",
+      success: function( data ){
+         $( "#output" ).val( JSON.stringify(data, null, 2) );
+      }
+  });
+}
+
+function listdoc(){
+  let dbname=$("#dbname").val();
+  let docname=$("#docname").val();
+  $.get(serverurl+'/'+dbname+'/'+docname,
+      function( data ){
+         $( "#output" ).val( JSON.stringify(data, null, 2) );
+  });
+}
+
+function finddata(){
+  let dbname=$("#dbname").val();
+  $.ajax({
+      url: serverurl+'/'+dbname+'/_find',
+      data: $("#finddoc").val(),
+      type: 'POST',
+      crossDomain: true,
+      dataType: "json",
+      contentType: "application/json",
+      success: function( data ){
+         $( "#output" ).val( JSON.stringify(data, null, 2) );
+      }
+  });
+}
+
+</script>
+
+</body>
+</html>
