@@ -163,7 +163,7 @@ for i = 1:length(bids)
             clear nii;
         elseif (~isempty(regexp(lower(fname), '\.tsv$', 'once')))
             savejson('', loadbidstsv(fullname), 'filename', fullfile(outputfolder, relpath, [fname, '.json']), opt);
-        elseif (~isempty(regexp(lower(fname), '\.tsv\.gz$', 'once')) && converters.iskey('.tar.gz'))
+        elseif (~isempty(regexp(lower(fname), '\.tsv\.gz$', 'once')) && converters.isKey('.tar.gz'))
             savejson('', loadbidstsv(fullname), 'filename', fullfile(outputfolder, relpath, [fname, '.json']), opt);
         elseif (strcmpi(fext, '.jbids')) % ignore previously generated digest files
             continue

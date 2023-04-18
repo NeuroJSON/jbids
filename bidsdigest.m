@@ -87,7 +87,7 @@ for i = 1:length(jbids)
     fprintf(1, 'merging %d/%d [%s]\n', i, length(jbids), fullname);
 
     origfile = regexprep(fname, '\.jbids$|\.jnii$', '');
-    origfile = regexprep(origfile, '\.tsv.json$', '.tsv');
+    origfile = regexprep(origfile, '(\.tsv|\.jpg|\.png|\.tif|\.bmp).json$', '$1');
 
     json(origfile) = loadjd(fullname, 'jdatadecode', 0, varargin{:});
 end
