@@ -51,6 +51,25 @@ json2couch('/path/to/digest.json', 'https://example.com:5984', 'dbname', 'ds001'
 ! jq '.bids_dataset_info."participants.tsv".age' digest.json
 ```
 
+## Supported formats
+
+Currently, this toolbox provides built-in metadata/digest extraction from
+a number of BIDS formats, including
+
+| Format       | Header data (searchable)                         | Attachment |
+| ------------ | ------------------------------------------------ | ---------- |
+| .json sidecar| directly copy to output                          | N/A        |
+| .nii/.nii.gz | call nii2jnii to extract JNIFTI header           | must enable|
+| .tsv         | call loadbidstsv to conver to JSON               | N/A        |
+| .tsv.gz      | call loadbidstsv to conver to JSON (must enable) | N/A        |
+| .jpg/.tif    | call img2jbids/imfinfo to extract core header    | must enable|
+| .png/.bmp    | call img2jbids/imfinfo to extract core header    | must enable|
+| .snirf       | call snirf2jbids/loadsnirf to extract most fields| must enable|
+|README/LICENSE| stored as a JSON string                          | N/A        |
+|README.md     | stored as a JSON string                          | N/A        |
+|CHANGES       | stored as a JSON string                          | N/A        |
+|CITATION.cff  | stored as a JSON string                          | N/A        |
+
 ## Why JSON
 
 The JBIDS toolbox is developed by the NeuroJSON project
