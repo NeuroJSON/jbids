@@ -3,3 +3,5 @@ project_root
 suppress_rule: "redundant_brackets"
 suppress_rule: "line_length"
 indent_function_file_body: false
+exclude_dir: "tools"
+

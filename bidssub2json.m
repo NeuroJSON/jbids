@@ -33,7 +33,7 @@ function bidssub2json(bidssubpath, outputfolder, varargin)
 %             attroot: a path specifying the output attachment output
 %                     folder; if not given, uses [outputfolder '/.att/']
 %             attachdata: a cell array of file suffices; the binary data
-%                     stored in these specified formats are saved as 
+%                     stored in these specified formats are saved as
 %                     attachments to generate self-contained datasets; by
 %                     default, it is empty {}, meaning that no attachment
 %                     file is generated, which reduces runtime.
@@ -76,9 +76,9 @@ if (~isfield(opt, 'jdatadecode'))
     opt.jdatadecode = 0;
 end
 
-defaultconverters={'.snirf', 'snirf2jbids', '.jpg', 'img2jbids', ...
-                   '.tif', 'img2jbids',     '.png', 'img2jbids', ...
-                   '.bmp', 'img2jbids'};
+defaultconverters = {'.snirf', 'snirf2jbids', '.jpg', 'img2jbids', ...
+                     '.tif', 'img2jbids',     '.png', 'img2jbids', ...
+                     '.bmp', 'img2jbids'};
 
 attachmentlimit = jsonopt('compressarraysize', 200, opt);
 attachmentfolder = jsonopt('attfolder', '.att', opt);
@@ -89,7 +89,7 @@ converters = jsonopt('converters', defaultconverters, opt);
 fopts = opt;
 fopts.outputfolder = outputfolder;
 
-if(isempty(converters) || bitand(length(converters), 1))
+if (isempty(converters) || bitand(length(converters), 1))
     error('converters must contains even numbers of file-suffix and parser-function name pairs');
 end
 converters = containers.Map(converters(1:2:end), converters(2:2:end));

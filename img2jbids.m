@@ -33,32 +33,32 @@ function [digestdata, attachdata] = img2jbids(fullname, varargin)
 
 opt = varargin2struct(varargin{:});
 attachmentfolder = jsonopt('attfolder', '.att', opt);
-outputfolder=jsonopt('outputfolder', '', opt);
+outputfolder = jsonopt('outputfolder', '', opt);
 attachmentroot = jsonopt('attroot', outputfolder, opt);
 pathhash = jsonopt('pathhash', fullname, opt);
 
 [fpath, fn, fext] = fileparts(fullname);
 
-if(nargout>1)
+if (nargout > 1)
     if (exist(fullfile(attachmentroot, attachmentfolder), 'dir') == 0 && mkdir(fullfile(attachmentroot, attachmentfolder)) == 0)
         error('failed to create output folder %s', fullfile(attachmentroot, attachmentfolder));
     end
     if (~copyfile(fullname, fullfile(attachmentroot, [pathhash fext])))
         error('failed to copy file %s', fullname);
     end
-    attachdata=[];
+    attachdata = [];
 end
 
 imgheader = struct;
 
 try
-    info=imfinfo(fullname);
-    info.Filename=[fn fext];
-    fn=fieldnames(info);
-    for i=1:min(length(fn), 9) % first 9 fields of imfinfo are the same
+    info = imfinfo(fullname);
+    info.Filename = [fn fext];
+    fn = fieldnames(info);
+    for i = 1:min(length(fn), 9) % first 9 fields of imfinfo are the same
         imgheader.ImageHeader.(fn{i}) = info.(fn{i});
     end
-    if(nargout>1)
+    if (nargout > 1)
         imgheader.ImageData = struct(encodevarname('_DataLink_'), ['/' attachmentfolder '/' pathhash fext]);
     end
 catch ME
