@@ -23,11 +23,12 @@ automation between data analysis pipelines.
 ## Installation
 
 The BIDS JSON-digest (JBIDS) toolbox has the below lightweight toolboxes as
-dependencies
+dependencies (also provided as submodules inside the `tools` subfolder)
 
 - JSONLab toolbox: https://neurojson.org/jsonlab
 - JNIFTY toolbox: https://github.com/NeuroJSON/jnifty
 - JSNIRF toolbox: https://github.com/NeuroJSON/jsnirfy
+- EasyH5 toolbox: https://github.com/NeuroJSON/easyh5
 - ZMat toolbox (https://github.com/NeuroJSON/zmat) - not needed for MATLAB,
   required for Octave (to unzip .nii.gz files)
 

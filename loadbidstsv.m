@@ -1,6 +1,8 @@
 function data = loadbidstsv(tsvfile, delim)
 %
 %    data = loadbidstsv(tsvfile)
+%       or
+%    data = loadbidstsv(tsvfile, delim)
 %
 %    Loading a BIDS-formatted .tsv (tab-separated values) or .tsv.gz file as a
 %    struct; numerical fields are converted to floating-point data records
@@ -11,6 +13,7 @@ function data = loadbidstsv(tsvfile, delim)
 %
 %    input:
 %        tsvfile: the path to the .tsv file
+%        delim: (optional) if not set, tab ('\t') is used as column delimiter
 %
 %    examples:
 %        data = loadbidstsv('participants.tsv');
@@ -48,6 +51,10 @@ else
     header = regexprep(header, '\s*$', '');
 end
 
+if (isempty(header))
+    return
+end
+
 if (exist('strsplit'))
     cols = strsplit(header, delim);
 else
@@ -62,7 +69,7 @@ if (~isempty(cols))
     end
     for i = 1:length(body)
         try
-            bodynum = cellfun(@str2num, body{i}, 'uniformoutput', 0);
+            bodynum = cellfun(@(x) sscanf(x, '%f'), body{i}, 'uniformoutput', 0);
             len = cellfun(@numel, bodynum);
             if (any(len))
                 body{i}(len > 0) = bodynum(len > 0);

@@ -84,7 +84,7 @@ for i = 1:length(jbids)
         continue
     end
     fullname = fullfile(jbids(i).folder, fname);
-    fprintf(1, 'merging %d [%s]\n', i, fullname);
+    fprintf(1, 'merging %d/%d [%s]\n', i, length(jbids), fullname);
 
     origfile = regexprep(fname, '\.jbids$|\.jnii$', '');
     origfile = regexprep(origfile, '\.tsv.json$', '.tsv');

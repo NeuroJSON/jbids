@@ -1,0 +1,15 @@
+[submodule "tools/jsonlab"]
+	path = tools/jsonlab
+	url = https://github.com/fangq/jsonlab.git
+[submodule "tools/zmat"]
+	path = tools/zmat
+	url = https://github.com/NeuroJSON/zmat.git
+[submodule "tools/jsnirfy"]
+	path = tools/jsnirfy
+	url = https://github.com/NeuroJSON/jsnirfy.git
+[submodule "tools/easyh5"]
+	path = tools/easyh5
+	url = https://github.com/NeuroJSON/easyh5.git
+[submodule "tools/jnifty"]
+	path = tools/jnifty
+	url = https://github.com/NeuroJSON/jnifty.git

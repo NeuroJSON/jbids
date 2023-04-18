@@ -39,6 +39,9 @@ function bids2json(datasetpath, outputfolder, varargin)
 %                     dataset-level metadata (such as
 %                     README/LICENSE/CHANGES). If not given,
 %                     'bids_dataset_info' is used.
+%             skipexisting: [1|0] if set to 1 (default), a subject folder
+%                     with a previously generated .jbids digest file will
+%                     be skipped
 %
 %    examples:
 %        bids2json('ds001', '../digest/ds001');
@@ -57,6 +60,7 @@ end
 opt = varargin2struct(varargin{:});
 subfilter = jsonopt('filter', '', opt);
 createdigest = jsonopt('digest', 1, opt);
+skipexisting = jsonopt('skipexisting', 1, opt);
 
 try
     bids = dir(datasetpath);
@@ -73,6 +77,8 @@ if (~isfield(bids, 'folder')) % for old matlab
 end
 
 info = containers.Map;
+
+% scan and index dataset top-level data files
 
 for i = 1:length(bids)
     if (bids(i).isdir)
@@ -98,14 +104,19 @@ for i = 1:length(bids)
     end
 end
 
+% save dataset information to bids_dataset_info.jbids
+
 if (~isempty(info))
     savejson('', info, 'filename', fullfile(outputfolder, [jsonopt('digestfile', 'bids_dataset_info', opt) '.jbids']), opt);
 end
 
+% scan and process all or selected subject folders
+
 for i = 1:length(bids)
-    if (bids(i).isdir && ~ismember(bids(i).name, {'.', '..'}))
+    if (bids(i).isdir && ~ismember(bids(i).name, {'.', '..', '.git', '.github'}))
         fname = bids(i).name;
-        if (isempty(subfilter) || ~isempty(regexp(fname, subfilter, 'once')))
+        if ((isempty(subfilter) || ~isempty(regexp(fname, subfilter, 'once'))) && ...
+            ~(skipexisting && ~isempty(dir([outputfolder filesep fname '.jbids']))))
             fprintf(1, 'processing %d [%s]\n', i, fname);
             bidssub2json(fullfile(bids(i).folder, fname), [outputfolder filesep fname], 'attroot', outputfolder, varargin{:});
             if (createdigest)
