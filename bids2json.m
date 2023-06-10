@@ -61,6 +61,9 @@ opt = varargin2struct(varargin{:});
 subfilter = jsonopt('filter', '', opt);
 createdigest = jsonopt('digest', 1, opt);
 skipexisting = jsonopt('skipexisting', 1, opt);
+if(~isfield(opt,'savebinary'))
+    opt.savebinary=0;
+end
 
 try
     bids = dir(datasetpath);

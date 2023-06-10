@@ -47,6 +47,9 @@ opt = varargin2struct(varargin{:});
 if (~isfield(opt, 'usemap'))
     opt.usemap = 1;
 end
+if(~isfield(opt,'savebinary'))
+    opt.savebinary=0;
+end
 
 json = parsefolder(jbidsfolder, opt);
 
