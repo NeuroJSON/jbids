@@ -59,7 +59,7 @@ try
         imgheader.ImageHeader.(fn{i}) = info.(fn{i});
     end
     if (nargout > 1)
-        imgheader.ImageData = struct(encodevarname('_DataLink_'), ['/' attachmentfolder '/' pathhash fext]);
+        imgheader.ImageData = struct(encodevarname('_DataLink_'), ['attach:' pathhash fext]);
     end
 catch ME
     warning('failed to load image file: %s\nerror: %s', fullname, ME.message);

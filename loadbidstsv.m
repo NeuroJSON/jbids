@@ -69,8 +69,13 @@ if (~isempty(cols))
     end
     for i = 1:length(body)
         try
-            bodynum = cellfun(@(x) sscanf(x, '%f'), body{i}, 'uniformoutput', 0);
-            len = cellfun(@numel, bodynum);
+            % bodynum = cellfun(@(x) sscanf(regexprep(x,'^n/a$','NaN'), '%f'), body{i}, 'uniformoutput', 0);
+            bodynum = cellfun(@(x) sscanf(x, '%f\t'), body{i}, 'uniformoutput', 0);
+            if (exist('isna'))
+                len = cellfun(@(x) numel(x) * (~isna(sum(x))), bodynum);
+            else
+                len = cellfun(@numel, bodynum);
+            end
             if (any(len))
                 body{i}(len > 0) = bodynum(len > 0);
                 if (all(len))
@@ -83,3 +88,5 @@ if (~isempty(cols))
         data.(cols{i}) = body{i}(:).';
     end
 end
+
+fclose(fid);

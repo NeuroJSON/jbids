@@ -42,6 +42,9 @@ function bids2json(datasetpath, outputfolder, varargin)
 %             skipexisting: [1|0] if set to 1 (default), a subject folder
 %                     with a previously generated .jbids digest file will
 %                     be skipped
+%             excludedir: a cell array specifying the folders to be excluded
+%                     if not defined, bids2json exclude any folder starts with
+%                      '.' as well as {'derivatives', 'code', 'sourcedata'}.
 %
 %    examples:
 %        bids2json('ds001', '../digest/ds001');
@@ -61,8 +64,14 @@ opt = varargin2struct(varargin{:});
 subfilter = jsonopt('filter', '', opt);
 createdigest = jsonopt('digest', 1, opt);
 skipexisting = jsonopt('skipexisting', 1, opt);
-if(~isfield(opt,'savebinary'))
-    opt.savebinary=0;
+excludedir = jsonopt('excludedir', {'derivatives', 'code', 'sourcedata'}, opt);
+
+if (~isfield(opt, 'usemap'))
+    opt.usemap = 1;
+end
+
+if (~isfield(opt, 'savebinary'))
+    opt.savebinary = 0;
 end
 
 try
@@ -97,26 +106,48 @@ for i = 1:length(bids)
             info(fname) = fileread(fullname);
         elseif (~isempty(regexp(fname, '\.json$', 'once')))
             info(fname) = loadjson(fullname, opt);
+        elseif (~isempty(regexp(fname, '\.md$|\.txt$', 'once')))
+            info(fname) = fileread(fullname);
         elseif (regexp(fname, '\.tsv(\.gz)*$'))
             info(fname) = loadbidstsv(fullname);
         else
             warning('file format unsupported: %s', fullname);
         end
     catch ME
-        error('faile to convert file %s, with error\n\t"%s"', fullname, ME.message);
+        linkdata = '';
+        if (isfield(bids(i), 'statinfo') && (isempty(bids(i)) || (isfield(bids(i).statinfo, 'modestr') && bids(i).statinfo.modestr(1) == 'l')))
+            linkdata = ls(fullname, '-l');
+            linkdata = regexprep(linkdata, '^.*\s+->\s+', '');
+        elseif (~isoctavemesh && (isempty(bids(i)) || isempty(bids(i).bytes) || ~bids(i).bytes == 0))
+            [islink, linkdata] = unix(sprintf('ls -l "%s"', fullname));
+            linkdata = regexprep(linkdata, '^.*\s+->\s+', '');
+        end
+
+        if (~isempty(linkdata))
+            info(fname) = struct(encodevarname('_DataLink_'), ['symlink:' strtrim(linkdata)]);
+        else
+            error('faile to convert file %s, with error\n\t"%s"', fullname, ME.message);
+        end
     end
 end
 
 % save dataset information to bids_dataset_info.jbids
 
 if (~isempty(info))
-    savejson('', info, 'filename', fullfile(outputfolder, [jsonopt('digestfile', 'bids_dataset_info', opt) '.jbids']), opt);
+    if (isKey(info, 'dataset_description.json') && opt.usemap && isKey(info('dataset_description.json'), 'BIDSVersion'))
+        savejson('', info, 'filename', fullfile(outputfolder, [jsonopt('digestfile', 'bids_dataset_info', opt) '.jbids']), opt);
+    else
+        savejson('', info, 'filename', fullfile(outputfolder, [jsonopt('digestfile', 'dataset_info', opt) '.jbids']), opt);
+    end
 end
 
 % scan and process all or selected subject folders
 
 for i = 1:length(bids)
-    if (bids(i).isdir && ~ismember(bids(i).name, {'.', '..', '.git', '.github'}))
+    if ((~isempty(info) && bids(i).isdir && ismember(bids(i).name, excludedir)) || (~isempty(bids(i).name) && bids(i).name(1) == '.'))
+        continue
+    end
+    if (bids(i).isdir)
         fname = bids(i).name;
         if ((isempty(subfilter) || ~isempty(regexp(fname, subfilter, 'once'))) && ...
             ~(skipexisting && ~isempty(dir([outputfolder filesep fname '.jbids']))))

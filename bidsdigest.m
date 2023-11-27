@@ -27,7 +27,7 @@ function data = bidsdigest(jbidsfolder, outputfile, rootname, varargin)
 %        data: a struct containing the parsed JSON-encoded data/metadata of
 %              the specified BIDS folder
 %
-%    examples:bids2json(', '/tmp/ds1', 'filter', '^sub-0[3-5]$');
+%    examples:
 %        bidsdigest('/path/to/ds1/sub-01', '/tmp/bids/sub-01.json')
 %        bidsdigest('/path/to/ds1/sub-02', '/tmp/bids/sub-02.json', 'sub-02', 'compact', 1)
 %        data = bidsdigest('/path/to/ds1')
@@ -47,8 +47,8 @@ opt = varargin2struct(varargin{:});
 if (~isfield(opt, 'usemap'))
     opt.usemap = 1;
 end
-if(~isfield(opt,'savebinary'))
-    opt.savebinary=0;
+if (~isfield(opt, 'savebinary'))
+    opt.savebinary = 0;
 end
 
 json = parsefolder(jbidsfolder, opt);
@@ -82,7 +82,7 @@ for i = 1:length(jbids)
             continue
         end
         if (isempty(regexp(fname, '^\.', 'once')))
-            json(fname) = parsefolder(fullfile(jbids(i).folder, fname));
+            json(fname) = parsefolder(fullfile(jbids(i).folder, fname), varargin{:});
         end
         continue
     end
@@ -90,7 +90,7 @@ for i = 1:length(jbids)
     fprintf(1, 'merging %d/%d [%s]\n', i, length(jbids), fullname);
 
     origfile = regexprep(fname, '\.jbids$|\.jnii$', '');
-    origfile = regexprep(origfile, '(\.tsv|\.jpg|\.png|\.tif|\.bmp).json$', '$1');
+    origfile = regexprep(origfile, '(\.tsv|\.jpg|\.png|\.tif|\.bmp|\.snirf).json$', '$1');
 
     json(origfile) = loadjd(fullname, 'jdatadecode', 0, varargin{:});
 end

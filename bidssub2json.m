@@ -84,7 +84,9 @@ attachmentlimit = jsonopt('compressarraysize', 200, opt);
 attachmentfolder = jsonopt('attfolder', '.att', opt);
 attachmentroot = jsonopt('attroot', outputfolder, opt);
 attachdata = jsonopt('attachdata', {}, opt);
+attachproto = jsonopt('attachproto', 'attach:', opt);
 converters = jsonopt('converters', defaultconverters, opt);
+compression = jsonopt('compression', 'zlib', opt);
 
 fopts = opt;
 fopts.outputfolder = outputfolder;
@@ -129,10 +131,27 @@ for i = 1:length(bids)
         pathhash = [filesep, relpath];
     end
     pathhash = [filesep subjectid pathhash];
+    if (pathhash(end) == filesep)
+        pathhash = pathhash(1:end - 1);
+    end
     pathhash = jdatahash(regexprep([pathhash, filesep, bids(i).name], '\\', '/'), 'md5');
+    if (~isempty(compression))
+        pathhash = [pathhash '-' compression];
+    end
 
     try
-        if (bids(i).bytes == 0)
+        linkdata = '';
+        if (isfield(bids(i), 'statinfo') && (isempty(bids(i)) || (isfield(bids(i).statinfo, 'modestr') && bids(i).statinfo.modestr(1) == 'l')))
+            linkdata = ls(fullname, '-l');
+            linkdata = regexprep(linkdata, '^.*\s+->\s+', '');
+        elseif (~isoctavemesh && (isempty(bids(i)) || isempty(bids(i).bytes) || bids(i).bytes == 0))
+            [islink, linkdata] = unix(sprintf('ls -l "%s"', fullname));
+            linkdata = regexprep(linkdata, '^.*\s+->\s+', '');
+        end
+
+        if (~isempty(linkdata))
+            temp = struct(encodevarname('_DataLink_'), ['symlink:' strtrim(linkdata)]);
+            savejson('', temp, 'filename', fullfile(outputfolder, relpath, [fname, '.jbids']), opt);
             continue
         end
         if (strcmpi(fext, '.json'))
@@ -156,10 +175,10 @@ for i = 1:length(bids)
                 if (exist(fullfile(attachmentroot, attachmentfolder), 'dir') == 0 && mkdir(fullfile(attachmentroot, attachmentfolder)) == 0)
                     error('failed to create output folder %s', fullfile(attachmentroot, attachmentfolder));
                 end
-                savebj('', nii.NIFTIData, 'filename', fullfile(attachmentroot, attachmentfolder, [pathhash, '.jdb']), 'compression', 'zlib', opt);
-                nii.NIFTIData = struct(encodevarname('_DataLink_'), ['/' attachmentfolder '/' pathhash '.jdb']);
+                savebj('', nii, 'filename', fullfile(attachmentroot, attachmentfolder, [pathhash, '.bnii']), 'compression', compression, opt);
+                nii.NIFTIData = struct(encodevarname('_DataLink_'), [attachproto pathhash '.bnii$.NIFTIData']);
             end
-            savejson('', nii, 'filename', fullfile(outputfolder, relpath, [fname, '.jnii']), opt);
+            savejson('', nii, 'filename', fullfile(outputfolder, relpath, [fname, '.jnii']), 'compression', compression, opt);
             clear nii;
         elseif (~isempty(regexp(lower(fname), '\.tsv$', 'once')))
             savejson('', loadbidstsv(fullname), 'filename', fullfile(outputfolder, relpath, [fname, '.json']), opt);
@@ -169,14 +188,14 @@ for i = 1:length(bids)
             continue
         elseif (converters.isKey(fext))
             fh = str2func(converters(fext));
-            fopts.pathhash = [attachmentfolder '/' pathhash];
+            fopts.pathhash = pathhash;
             if (ismember(fext, attachdata))
                 [filedigest, fileattach] = fh(fullname, fopts);
                 if (~isempty(fileattach))
                     if (exist(fullfile(attachmentroot, attachmentfolder), 'dir') == 0 && mkdir(fullfile(attachmentroot, attachmentfolder)) == 0)
                         error('failed to create output folder %s', fullfile(attachmentroot, attachmentfolder));
                     end
-                    savebj('', fileattach, 'filename', fullfile(attachmentroot, attachmentfolder, [pathhash, '.jdb']), 'compression', 'zlib', opt);
+                    savebj('', fileattach, 'filename', fullfile(attachmentroot, attachmentfolder, [pathhash, '.jdb']), 'compression', compression, opt);
                 end
                 clear fileattach;
             else
