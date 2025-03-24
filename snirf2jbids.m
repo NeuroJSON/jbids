@@ -35,7 +35,7 @@ opt = varargin2struct(varargin{:});
 pathhash = jsonopt('pathhash', fullname, opt);
 attachproto = jsonopt('attachproto', 'attach:', opt);
 
-if(~isempty(jsonopt('compression', '', opt)))
+if (~isempty(jsonopt('compression', '', opt)))
     pathhash = [pathhash '-' opt.compression];
 end
 
@@ -53,7 +53,7 @@ if (nargout > 1)
     if (isfield(snirf.SNIRFData.nirs, 'aux'))
         attachdata.aux = snirf.SNIRFData.nirs.aux;
     end
-    bytelen = length(savebj('', attachdata, 'compression','zlib'));
+    bytelen = length(savebj('', attachdata, 'compression', 'zlib'));
 
     snirf.SNIRFData.nirs.data = struct(encodevarname('_DataLink_'), [attachproto pathhash '.jdb:$.data' '&size=' num2str(bytelen)]);
     if (isfield(snirf.SNIRFData.nirs, 'aux'))

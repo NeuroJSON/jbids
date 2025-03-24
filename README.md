@@ -1,15 +1,15 @@
 ![](https://neurojson.org/wiki/upload/neurojson_banner_long.png)
 
-BIDS JSON Digest Toolbox for MATLAB/Octave
+BIDS-to-JSON Converter for MATLAB/Octave
 ========================================================================================
 
 * Maintainer: Qianqian Fang <q.fang at neu.edu>
 * License: BSD License, see LICENSE_BDS.txt
-* Version: 0.5
+* Version: 0.8
 * URL: https://neurojson.org/
 * Compatibility: MATLAB R2010b or newer, GNU Octave 4.4 or newer
 * Acknowledgement: This project is supported by US National Institute of Health (NIH) 
-  grant [U24-NS124027](https://reporter.nih.gov/project-details/10308329)
+  grant [U24-NS124027](https://neurojson.org)
 
 
 This toolbox extracts searchable data and metadata and creates

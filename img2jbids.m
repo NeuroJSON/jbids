@@ -23,7 +23,7 @@ function [digestdata, attachdata] = img2jbids(fullname, varargin)
 %             attachment file
 %
 %    examples:
-%        [imgheader, imgdata]= img2jbids('/path/bs001/subj01/nirs/subj01_test.jpg');
+%        [imgheader, imgdata] = img2jbids('/path/bs001/subj01/nirs/subj01_test.jpg');
 %
 %    license:
 %        BSD license, see LICENSE_BSD.txt files for details
