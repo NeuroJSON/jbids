@@ -1,6 +1,6 @@
 [submodule "tools/jsonlab"]
 	path = tools/jsonlab
-	url = https://github.com/fangq/jsonlab.git
+	url = https://github.com/NeuroJSON/jsonlab.git
 [submodule "tools/zmat"]
 	path = tools/zmat
 	url = https://github.com/NeuroJSON/zmat.git
